@@ -36,7 +36,7 @@ def main():
     parser = argparse.ArgumentParser(description="Train a simple CNN on CIFAR-10")
     parser.add_argument("--data_dir", type=str, default="./data")
     parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=10)
 
     args = parser.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -48,11 +48,20 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465),(0.2470, 0.2435, 0.2616),),          
     ])
+    train_transform = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        (0.4914, 0.4822, 0.4465),
+        (0.2470, 0.2435, 0.2616),
+    ),
+])
     num_workers = 2
     train_dataset = datasets.CIFAR10(root=args.data_dir,
                                     train=True,
                                     download=True,
-                                    transform=transform)
+                                    transform=train_transform)
     test_dataset = datasets.CIFAR10(root=args.data_dir,
                                     train=False,
                                     download=True,
