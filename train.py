@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-
+import time
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -48,7 +48,7 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465),(0.2470, 0.2435, 0.2616),),          
     ])
-
+    num_workers = 2
     train_dataset = datasets.CIFAR10(root=args.data_dir,
                                     train=True,
                                     download=True,
@@ -60,15 +60,19 @@ def main():
 
     train_loader = DataLoader(train_dataset,
                             batch_size=args.batch_size,
-                            num_workers=2,
+                            num_workers=num_workers,
                             shuffle=True,
+                            persistent_workers=num_workers > 0,
+                            prefetch_factor=2 if num_workers > 0 else None,
                             pin_memory=device.type == "cuda")
 
     test_loader = DataLoader(test_dataset,
-                                    batch_size=args.batch_size,
-                                    num_workers=2,
-                                    shuffle=False,
-                                    pin_memory=device.type == "cuda")
+                            batch_size=args.batch_size,
+                            num_workers=num_workers,
+                            shuffle=False,
+                            persistent_workers=num_workers > 0,
+                            prefetch_factor=2 if num_workers > 0 else None,
+                            pin_memory=device.type == "cuda")
 
     model = SimpleCNN().to(device)
     criterion = nn.CrossEntropyLoss()
@@ -115,6 +119,9 @@ def main():
 
 
 if __name__ == "__main__":
+    t1 = time.perf_counter()
     main()
+    t2 = time.perf_counter()
+    print(f"Training completed in {t2-t1:.2f} seconds")
 
 
