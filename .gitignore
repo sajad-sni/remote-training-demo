@@ -1,0 +1,31 @@
+# python virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc/
+*.pyo
+
+data/
+
+# Models
+*.pt
+*.pth
+
+
+# training results
+outputs/
+checkpoints/
+results/
+logs/
+
+# IDE/OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+#Secrets
+.env
+*.key
+
